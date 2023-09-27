@@ -22,9 +22,10 @@ void read_command(char *command, char *parameters[])
     input[strcspn(input, "\n")] = '\0';
 
     char *token = strtok(input, " ");
-    strcpy(command, token);
+    strncpy(command, token, MAX_COMMAND_LENGTH);
 
-    if (strcmp(command, "exit") == 0){
+    if (strcmp(command, "exit") == 0)
+    {
         printf("\nSaindo do shell...\n\n");
         exit(0);
     }

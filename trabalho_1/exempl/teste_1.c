@@ -1,60 +1,81 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "stdio.h"
+#include "string.h"
+#include "stdlib.h"
+#include "sys/wait.h"
+#include "unistd.h"
 
-#define MAX_COMMAND_LENGTH 100
-#define MAX_HISTORY_SIZE 10
-
-void print_history(char history[MAX_HISTORY_SIZE][MAX_COMMAND_LENGTH], int history_size)
+void read_command(char cmd[], char *par[])
 {
-    printf("Command history:\n");
-    for (int i = 0; i < history_size; i++)
+    char line[1024];
+    int count = 0, i = 0, j = 0;
+    char *array[100], *pch;
+
+    for (;;)
     {
-        printf("%d: %s\n", i + 1, history[i]);
+        int c = fgetc(stdin);
+        line[count++] = (char)c;
+        if (c == '\n')
+        {
+            break;
+        }
+        if (count == 1)
+        {
+            return;
+        }
+        pch = strtok(line, "\n");
+
+        while (pch != NULL)
+        {
+            array[i++] = strdup(pch);
+            pch = strtok(NULL, "\n");
+        }
+
+        strcpy(cmd, array[0]);
+
+        for (int j = 0; j < i; j++)
+        {
+            par[j] = array[j];
+            par[i] = NULL;
+        }
     }
+}
+
+void type_prompt()
+{
+    static int first_time = 1;
+    if (first_time)
+    {
+        const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
+        write(STDERR_FILENO, CLEAR_SCREEN_ANSI, 12);
+        first_time = 0;
+    }
+
+    printf("#");
 }
 
 int main()
 {
-    char command[MAX_COMMAND_LENGTH];
-    char history[MAX_HISTORY_SIZE][MAX_COMMAND_LENGTH];
-    int history_size = 0;
+    char cmd[100], command[100], *parameters[20];
 
+    char *envp[] = {(char *)"PATH=/bin", 0};
     while (1)
     {
-        printf("Enter a command: ");
-        fgets(command, sizeof(command), stdin);
-        command[strcspn(command, "\n")] = '\0'; // Remove trailing newline character
-
+        type_prompt();
+        read_command(command, parameters);
+        if (fork() != 0)
+        {
+            wait(NULL);
+        }
+        else
+        {
+            strcpy(cmd, "/bin/");
+            strcpy(cmd, command);
+            execvp(cmd, parameters);
+        }
         if (strcmp(command, "exit") == 0)
         {
             break;
         }
-        else if (strcmp(command, "history") == 0)
-        {
-            print_history(history, history_size);
-        }
-        else
-        {
-            if (history_size < MAX_HISTORY_SIZE)
-            {
-                strcpy(history[history_size], command);
-                history_size++;
-            }
-            else
-            {
-                // Shift the history array to make space for the new command
-                for (int i = 0; i < MAX_HISTORY_SIZE - 1; i++)
-                {
-                    strcpy(history[i], history[i + 1]);
-                }
-                strcpy(history[MAX_HISTORY_SIZE - 1], command);
-            }
-
-            printf("Executing command: %s\n", command);
-            // Add code here to execute the command
-        }
     }
-
     return 0;
 }
