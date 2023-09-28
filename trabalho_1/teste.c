@@ -14,6 +14,16 @@ void type_prompt()
     printf(">>> ");
 }
 
+void print_command_and_parameters(char *command, char **parameters)
+{
+    printf("Command: %s\n", command);
+    printf("Parameters:\n");
+    for (int i = 0; parameters[i] != NULL; i++)
+    {
+        printf("  - %s\n", parameters[i]);
+    }
+}
+
 void read_command(char *command, char *parameters[])
 {
     char input[MAX_COMMAND_LENGTH];
@@ -43,7 +53,7 @@ void read_command(char *command, char *parameters[])
 int main()
 {
     char command[MAX_COMMAND_LENGTH];
-    char *parameters[MAX_PARAMETERS + 1];
+    char *parameters[MAX_PARAMETERS];
     int status;
 
     system("clear");
@@ -54,6 +64,7 @@ int main()
     {
         type_prompt();
         read_command(command, parameters);
+        print_command_and_parameters(command, parameters);
 
         if (fork() != 0)
         {

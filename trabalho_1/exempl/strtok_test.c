@@ -4,7 +4,7 @@
 int main()
 {
     char input[100];
-    char command[100];
+    char command[1];
 
     printf("Digite um comando: ");
     fgets(input, sizeof(input), stdin);
