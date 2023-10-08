@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": false,
-      "cwd": "/home/gledson/Sistema_Operacional/trabalho_1/exempl",
-      "program": "/home/gledson/Sistema_Operacional/trabalho_1/exempl/build/Debug/outDebug",
+      "cwd": "/home/gledson/Sistema_Operacional/trabalho_2",
+      "program": "/home/gledson/Sistema_Operacional/trabalho_2/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
