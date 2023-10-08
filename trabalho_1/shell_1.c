@@ -1,10 +1,14 @@
 /*
  * Este programa é um shell simplificado que permite ao usuário executar comandos e navegar pelos diretórios.
- * Também mantém um histórico dos comandos executados e permite ao usuário visualizá-lo.
- * O programa usa chamadas de sistema como fork(), execvp(), chdir() e waitpid() para executar comandos e navegar em diretórios.
- * O programa também define constantes como TRUE, MAX_COMANDO, MAX_PARAMETROS e MAX_HISTORICO para limitar o tamanho das matrizes de comandos e parâmetros e do buffer de histórico.
- * O programa também define funções como adicionar_historico(), exibir_historico() e ler_comando() para adicionar comandos ao buffer de histórico, exibir o buffer de histórico e ler a entrada do usuário.
- * O programa usa a variável de ambiente HOME para definir o diretório inicial e a variável de ambiente PWD para controlar o diretório atual.
+ * Ele também fornece um recurso de histórico de comandos que permite ao usuário visualizar os últimos comandos executados.
+ * O programa usa a biblioteca readline para ler a entrada do usuário e as chamadas do sistema fork e execvp para executar comandos.
+ * O programa também usa as chamadas de sistema chdir e setenv para navegar pelos diretórios e definir variáveis ​​de ambiente.
+ * O programa possui os seguintes comandos:
+ * - cd: alterar diretório
+ * - exit: sai do shell
+ * - histórico: veja o histórico de comandos
+ * O programa possui um comprimento máximo de comando de 100 caracteres e um máximo de 10 parâmetros por comando.
+ * O programa possui um tamanho máximo de histórico de 10 comandos.
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +16,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #define TRUE 1
 #define MAX_COMANDO 100
@@ -21,6 +27,12 @@
 char historico[MAX_HISTORICO][MAX_COMANDO];
 int posicao_historico = 0;
 
+/*
+ * Esta função adiciona um comando ao histórico.
+ * Se o comando tiver mais de 0 caracteres, ele será adicionado ao array de histórico.
+ * O array de histórico tem tamanho máximo de 10 comandos.
+ * A posição do último comando adicionado é armazenada na variável posicao_historico.
+ */
 void adicionar_historico(char *comando)
 {
     if (strlen(comando) > 0)
@@ -30,6 +42,10 @@ void adicionar_historico(char *comando)
     }
 }
 
+/*
+ * Esta função exibe o histórico de comandos.
+ * A função itera pela matriz de histórico e imprime cada comando com comprimento maior que 0.
+ */
 void exibir_historico()
 {
     int i, j;
@@ -44,14 +60,20 @@ void exibir_historico()
     }
 }
 
+/*
+ * Esta função lê a entrada do usuário e a analisa em um comando e seus parâmetros.
+ * A função usa a biblioteca readline para ler a entrada do usuário e a função strtok para analisar a entrada.
+ * A função também adiciona o comando ao histórico utilizando a função adicionar_historico.
+ * A função possui no máximo 10 parâmetros por comando.
+ */
 void ler_comando(char *parametro[])
 {
-    char input[MAX_COMANDO];
-    fgets(input, sizeof(input), stdin);
-    input[strcspn(input, "\n")] = '\0';
+    char *prompt = strcat(getcwd(NULL, 0), " - > ");
+    char *input = readline(prompt);
 
     if (strlen(input) > 0)
     {
+        add_history(input);
         adicionar_historico(input);
     }
 
@@ -64,8 +86,18 @@ void ler_comando(char *parametro[])
         i++;
     }
     parametro[i] = NULL;
+    free(input);
 }
 
+/*
+ * Esta é a principal função do programa.
+ * A função inicializa o array de histórico e define o diretório atual como o diretório inicial.
+ * A função então entra em um loop que lê a entrada do usuário e executa comandos até que o usuário insira o comando “exit”.
+ * A função usa as chamadas de sistema fork e execvp para executar comandos e a chamada de sistema waitpid para aguardar a conclusão do processo filho.
+ * A função também usa as chamadas de sistema chdir e setenv para navegar pelos diretórios e definir variáveis ​​de ambiente.
+ * A função tem um comprimento máximo de comando de 100 caracteres e um máximo de 10 parâmetros por comando.
+ * A função tem um tamanho máximo de histórico de 10 comandos.
+ */
 int main()
 {
     char *parametro[MAX_PARAMETROS + 1];
@@ -78,8 +110,6 @@ int main()
 
     while (TRUE)
     {
-
-        printf("%s - > ", getcwd(s, 100));
         ler_comando(parametro);
 
         if (parametro[0] == NULL)
