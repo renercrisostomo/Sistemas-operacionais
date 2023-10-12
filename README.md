@@ -1,2 +1,3 @@
-# Sistema_Operacional
-Atividades e trabalhos desenvolvidos em C realizados durante a disciplina
+# Sistemas Operacionais
+
+Repositório com todas as minhas atividades da disciplina Sistemas Operacionais do curso Ciências da computação 5º semestre do IFCE Maracanaú
