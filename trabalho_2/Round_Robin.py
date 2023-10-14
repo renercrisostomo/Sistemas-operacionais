@@ -1,3 +1,6 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
 from fila import Queue
 
 class Round_Robin:
@@ -62,13 +65,18 @@ class Round_Robin:
         print(f"Tempo médio de espera: {tempo_medio_espera}\nTempo médio de termino: {tempo_medio_termino}\nVazão: {vazao}")
         return tempo_medio_espera, tempo_medio_termino, vazao
     
-tempo_medio_espera_array, tempo_medio_termino_array, vazao_array = [], [], []
+quantum = np.arange(30)
+tempoMedioEsperaArray, tempoMedioRetornoArray, vazaoArray = np.zeros(30), np.zeros(30), np.zeros(30)
 rr = Round_Robin()
 rr.ler_entrada()
-for i in range(1, 3):
-    tempo_medio_espera, tempo_medio_termino, vazao = rr.roundrobin(i)
-    tempo_medio_espera_array.append(tempo_medio_espera)
-    tempo_medio_termino_array.append(tempo_medio_termino)
-    vazao_array.append(vazao)
+for i in range(30):
+    tempoMedioEsperaArray[i], tempoMedioRetornoArray[i], vazaoArray[i] = rr.roundrobin(i+1)
 
-print(f"Tempo médio de espera: {tempo_medio_espera_array}\nTempo médio de termino: {tempo_medio_termino_array}\nVazão: {vazao_array}")
+plt.plot(quantum, tempoMedioEsperaArray, label='Tempo médio de espera')
+plt.plot(quantum, tempoMedioRetornoArray, label='Tempo médio de retorno')
+plt.plot(quantum, vazaoArray, label='Vazão')
+plt.xlabel('Quantum')
+plt.ylabel('Valores')
+plt.legend()
+plt.show()
+print(f"Tempo médio de espera: {tempoMedioEsperaArray}\nTempo médio de termino: {tempoMedioRetornoArray}\nVazão: {vazaoArray}")
