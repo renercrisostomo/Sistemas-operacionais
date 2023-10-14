@@ -1,8 +1,8 @@
 from fila import Queue
 
 class Round_Robin:
-    def __init__(self, quantum):
-        self.quantum = quantum
+    def __init__(self):
+        self.quantum = None
         self.terminals = None
         self.tempo = 0
         self.tempo_terminado = None
@@ -24,10 +24,12 @@ class Round_Robin:
             self.q2.enQueue(tempo_inicial)
             self.tempo_total += tempo_inicial
     
-    def roundrobin(self):
-        self.ler_entrada()
-        self.quantum = int(input("Digite o quantum: "))
+    def roundrobin(self, valor):
+        if self.q is None:
+            self.ler_entrada()
+        self.quantum = valor
         aux = 0
+        processos_concluidos = 0
         for self.tempo in range(self.tempo_total):
             self.tempo = aux
             for i in range(self.qde_processos):
@@ -42,17 +44,31 @@ class Round_Robin:
                         print(f"[\t{self.tempo} \t|\t P{i + 1} \t|\t {self.q2.getValueAtPosition(i + 1)} \t]")
                     if (self.q2.getValueAtPosition(i + 1) == 0):
                         self.terminals[i] = 1
+                        processos_concluidos += 1
                     aux = self.tempo
                     self.tempo_terminado[i] = self.tempo
         print(f"\nTempo total: {self.tempo_total}")
-        self.imprimir()
+        return self.imprimir(processos_concluidos)
         
-    def imprimir(self):
+    def imprimir(self, processos_concluidos):
         print("Processo\t\t Tempo de execução\t Tempo de chegada\t Tempo de espera\t Tempo de termino")
         for i in range(self.qde_processos):
             print(f"P{i + 1}\t\t\t {self.q.getValueAtPosition(i + 1)}\t\t\t 0\t\t\t {self.tempo_terminado[i] - self.q.getValueAtPosition(i + 1)}\t\t\t {self.tempo_terminado[i]}")
-            
-        print(f"Tempo médio de espera: {(sum(self.tempo_terminado) - sum(self.q.que)) / self.qde_processos}\nTempo médio de termino: {sum(self.tempo_terminado) / self.qde_processos}\nVazão: {self.qde_processos / self.tempo_total}")
         
-rr = Round_Robin(5)
-rr.roundrobin()
+        tempo_medio_espera = (sum(self.tempo_terminado) - sum(self.q.que)) / self.qde_processos
+        tempo_medio_termino = sum(self.tempo_terminado) / self.qde_processos
+        vazao = processos_concluidos / self.tempo_total
+            
+        print(f"Tempo médio de espera: {tempo_medio_espera}\nTempo médio de termino: {tempo_medio_termino}\nVazão: {vazao}")
+        return tempo_medio_espera, tempo_medio_termino, vazao
+    
+tempo_medio_espera_array, tempo_medio_termino_array, vazao_array = [], [], []
+rr = Round_Robin()
+rr.ler_entrada()
+for i in range(1, 3):
+    tempo_medio_espera, tempo_medio_termino, vazao = rr.roundrobin(i)
+    tempo_medio_espera_array.append(tempo_medio_espera)
+    tempo_medio_termino_array.append(tempo_medio_termino)
+    vazao_array.append(vazao)
+
+print(f"Tempo médio de espera: {tempo_medio_espera_array}\nTempo médio de termino: {tempo_medio_termino_array}\nVazão: {vazao_array}")
